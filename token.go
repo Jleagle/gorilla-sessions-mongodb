@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-type Token interface {
+type TokenInterface interface {
 	GetToken(r *http.Request, name string) (string, error)
 	SetToken(w http.ResponseWriter, name, value string, options *sessions.Options)
 }
