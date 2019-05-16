@@ -35,10 +35,10 @@ func New(ctx context.Context, collection *mongo.Collection, options *sessions.Op
 
 // Session struct stored in MongoDB
 type SessionRow struct {
-	ID           string     `bson:"_id"`
-	UserID       int        `bson:"user_id"`
-	Data         string     `bson:"data"`
-	LastAccessed *time.Time `bson:"last_accessed"`
+	ID           string    `bson:"_id"`
+	UserID       int       `bson:"user_id"`
+	Data         string    `bson:"data"`
+	LastAccessed time.Time `bson:"last_accessed"`
 }
 
 func (s SessionRow) bson() bson.M {
@@ -59,7 +59,7 @@ type Store struct {
 	ctx        context.Context
 }
 
-func (s *Store) Get(r *http.Request, name string) (*sessions.Session, error) {
+func (s *Store) Get(r *http.Request, name string) (gSession *sessions.Session, err error) {
 	return sessions.GetRegistry(r).Get(s, name)
 }
 
@@ -209,7 +209,7 @@ func (s *Store) upsert(gSession *sessions.Session) error {
 	sess := SessionRow{
 		ID:           objectID.String(),
 		Data:         encoded,
-		LastAccessed: &accessed,
+		LastAccessed: accessed,
 	}
 
 	_, err = s.collection.UpdateOne(s.ctx, bson.M{"_id": sess.ID}, sess.bson(), options.Update().SetUpsert(true))
